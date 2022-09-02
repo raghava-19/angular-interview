@@ -111,6 +111,10 @@ export class MultiCheckComponent implements OnChanges, AfterViewInit {
   private fetchCheckbox(id: string) {
     return document.getElementById(id);
   }
+
+  public calculateCheckedState(option: Option): boolean {
+    return this.values?.includes(option.value);
+  }
   
   //emit selected options
   private emitCheckBoxSelection(): void {

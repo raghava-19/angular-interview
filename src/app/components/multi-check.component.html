@@ -9,6 +9,7 @@
                     <div>
                         <input type="checkbox" attr.id="form-check-input {{option.value}}" [name]="option.label"
                             [value]="option.value" [class]="(option.value == '-999' ) ? 'selectall':'form-check-box' "
+                            [checked]="calculateCheckedState(option)"
                             (click)="checkBoxOptionClicked(option, $event)" />
                         <label attr.for="form-check-input {{option.value}}" class="align-middle ml-1 width-8rem">
                             {{ option.label }}</label>
