@@ -1,16 +1,20 @@
 <div class="row m-5">
     <div class="card">
-        <div class="card-header p-2">
-            <span class="card-title font-weight-bold">{{ label }}</span>
+        <div class="card-header p-2 mw-3">
+            <span class="card-title font-weight-bold">{{ multiCheckInput.labels.label }}</span>
         </div>
-        <div *ngIf="options.length > 0" id="options_container" class="m-2 p-2 border rounded">
-            <ng-container *ngFor="let option of options">
-                <div>
-                    <input type="checkbox" [id]="option.label" [name]="option.label" [value]="option.value" />
-                    <label [for]="option.label" class="align-middle ml-1 width-8rem">
-                        {{ option.label }}</label>
-                </div>
-            </ng-container>
+        <ng-container  *ngIf="options.length > 0">
+        <div id="options_container" class="m-2 p-2 border rounded">
+                <ng-container *ngFor="let option of options">
+                    <div>
+                        <input type="checkbox" attr.id="form-check-input {{option.value}}" [name]="option.label"
+                            [value]="option.value" [class]="(option.value == '-999' ) ? 'selectall':'form-check-box' "
+                            (click)="checkBoxOptionClicked(option, $event)" />
+                        <label attr.for="form-check-input {{option.value}}" class="align-middle ml-1 width-8rem">
+                            {{ option.label }}</label>
+                    </div>
+                </ng-container>
         </div>
+    </ng-container>
     </div>
 </div>

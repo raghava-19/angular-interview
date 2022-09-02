@@ -2,8 +2,8 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input,
 import { MultiCheckInput } from '../app.component';
 
 export type Option = {
-	label: string;
-	value: string;
+  label: string;
+  value: string;
 };
 
 /**
@@ -25,27 +25,97 @@ export type Option = {
   styleUrls: ['./multi-check.component.less'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class MultiCheckComponent implements OnChanges ,AfterViewInit {
+export class MultiCheckComponent implements OnChanges, AfterViewInit {
 
   @Input() multiCheckInput = {} as MultiCheckInput;
   @Output() onChange = new EventEmitter<Option[]>();
-  public label!: string;
-  public columns!: number;
-  public options : Option[] = []
+  public values: string[] = [];
+  public options: Option[] = [];
 
-
+  /**
+   * 
+   * @param multiCheckInput has all the required inputs
+   */
   ngOnChanges(changes: SimpleChanges) {
-   if(changes.multiCheckInput){
+    if (changes.multiCheckInput) {
       this.options = changes.multiCheckInput.currentValue.options;
-      this.label = changes.multiCheckInput.currentValue.labels.label; 
-      this.columns = changes.multiCheckInput.currentValue.labels.columns_shown;
+      this.values = changes.multiCheckInput.currentValue.values;
     }
   }
 
-
   ngAfterViewInit() {
-    const item = document.getElementById('options_container');
-    item!.style.columnCount = String(this.columns);
+    const item = document?.getElementById('options_container');
+    item!.style.columnCount = String(this.multiCheckInput.labels.columns_shown);
+  }
+
+  /**
+   * 
+   * @param option source option
+   * @param event event
+   */
+  public checkBoxOptionClicked(option: Option, event: Event) {
+    //check for selectall option
+    if (option?.label == this.multiCheckInput?.labels?.select_all_label) {
+      this.values = [];
+      this.setCheckboxesState(this.fetchAllCheckboxes(), (<HTMLInputElement>event?.target)?.checked);
+    } else {
+      //check for other options
+      const sourceElement = this.fetchCheckbox((<HTMLInputElement>event?.target)?.id);
+      this.setCheckboxesState(sourceElement, !this.values?.includes(option.value));
+      this.validateSelectedValues();
+    }
+    this.emitCheckBoxSelection();
+  }
+  
+  /**
+   * Update the HTMLElement checked's state
+   * @param checkboxes 
+   * @param checkedstate checks if element is alreadey selected or not
+   * @param selectIndividual 
+   */
+  private setCheckboxesState(checkboxes: (NodeList | Element | null), checkedstate: boolean, selectIndividual: boolean = true) {
+    let checkboxeslist = checkboxes instanceof NodeList ? checkboxes : [checkboxes];
+    checkboxeslist.forEach((input) => {
+      let item = input as HTMLInputElement;
+      item.checked = checkedstate;
+      (selectIndividual) ? this.updateSelectedValues(item.defaultValue, new Event('click'), item.checked) : null;
+    }
+    )
+  }
+
+  //update values array to store selected options
+  private updateSelectedValues(value: string, event: Event, targedChecked?: boolean) {
+    if ((<HTMLInputElement>event?.target)?.checked || targedChecked) {
+      this.values.push(value);
+    } else {
+      let index = this.values.indexOf(value);
+      (index > -1) ? this.values.splice(index, 1) : null;
+    }
+  }
+
+  //to monitor if all options are selected individually
+  private validateSelectedValues() {
+    let selectAllElement = this.fetchCheckbox('form-check-input ' + this.multiCheckInput.labels.select_all_value);
+    console.log('selectall', selectAllElement)
+    if (this.values.length === this.options.length - 1) {
+      this.setCheckboxesState(selectAllElement, true, false);
+    } else {
+      this.setCheckboxesState(selectAllElement, false, false);
+    }
+  }
+
+  private fetchAllCheckboxes() {
+    return document.querySelectorAll('.form-check-box');
+  }
+
+  private fetchCheckbox(id: string) {
+    return document.getElementById(id);
+  }
+  
+  //emit selected options
+  private emitCheckBoxSelection(): void {
+    this.onChange.emit(this.options?.filter(option => option.label !== this.multiCheckInput?.labels?.select_all_label
+      && this.values?.includes(option.value)));
   }
 
 }

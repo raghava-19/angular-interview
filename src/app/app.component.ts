@@ -2,10 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Option } from './components/multi-check.component';
 import  * as MultiCheckLabels from '../assets/multi-check-labels.json';
 const defaultValues: string[] = [];
+export interface JsonData {
+  label:            string;
+  select_all_label: string;
+  select_all_value: string;
+  columns_shown:    number;
+}
+
 export type MultiCheckInput ={
   options : Option[];
   values: string[];
-  labels: Object;
+  labels: JsonData;
   columns: number;
 }
 
@@ -40,6 +47,7 @@ export class AppComponent implements OnInit{
 
   ngOnInit(): void {
     this.options?.length > 0 ? this.options?.unshift(this.selectAllOption) :'';
+    this.options = [...new Map(this.options.map(option => [option.value, option])).values()];
     this.frameOptionsOnLoad();
   }
 
