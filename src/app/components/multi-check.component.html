@@ -1,0 +1,16 @@
+<div class="row m-5">
+    <div class="card">
+        <div class="card-header p-2">
+            <span class="card-title font-weight-bold">{{ label }}</span>
+        </div>
+        <div *ngIf="options.length > 0" id="options_container" class="m-2 p-2 border rounded">
+            <ng-container *ngFor="let option of options">
+                <div>
+                    <input type="checkbox" [id]="option.label" [name]="option.label" [value]="option.value" />
+                    <label [for]="option.label" class="align-middle ml-1 width-8rem">
+                        {{ option.label }}</label>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>
